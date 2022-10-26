@@ -7,7 +7,7 @@ import xmltodict
 import oracledb
 
 
-def prepare_database(username:str, password:str, connectstring:str) -> None:
+def prepare_database(username: str, password: str, connectstring: str) -> None:
     print("Setting up database")
     with oracledb.connect(user=username, password=password, dsn=connectstring) as connection:
         with connection.cursor() as cursor:
@@ -39,7 +39,7 @@ def prepare_database(username:str, password:str, connectstring:str) -> None:
             cursor.execute("truncate table team")
 
 
-def fetch_data(username:str, password:str, connectstring:str) -> None:
+def fetch_data(username: str, password: str, connectstring: str) -> None:
     drivers_map = {}
     drivers_data_map = {}
     teams = {}
@@ -121,7 +121,7 @@ def fetch_data(username:str, password:str, connectstring:str) -> None:
             race_list = d['MRData']['RaceTable']['Race']
             race_driver_map_seq = 1
             for i, race in enumerate(race_list):
-                results_url = f"http://ergast.com/api/f1/2022/{race['@round']}/results"
+                results_url = f"http://ergast.com/api/f1/{year}/{race['@round']}/results"
                 response = requests.get(results_url)
                 race_data = xmltodict.parse(response.text)
                 if race_data['MRData']['@total'] != "0":
@@ -130,11 +130,13 @@ def fetch_data(username:str, password:str, connectstring:str) -> None:
                     for rr in result_list:
                         cursor.execute(
                             "insert into driver_race_map values (:driver_race_map_id, :race_id, :driver_id, :position)",
-                            [race_driver_map_seq, race['@round'], drivers_map[rr['Driver']['@driverId']], rr['@position']])
+                            [race_driver_map_seq, race['@round'], drivers_map[rr['Driver']['@driverId']],
+                             rr['@position']])
                         race_driver_map_seq += 1
             connection.commit()
 
-if __name__ == "__main__" :
+
+if __name__ == "__main__":
 
     year = None
 
@@ -142,7 +144,8 @@ if __name__ == "__main__" :
     parser.add_argument('-u', '--user', help='sys username', required=True)
     parser.add_argument('-p', '--password', help='sys password', required=True)
     parser.add_argument('-cs', '--connectstring', help='connectstring of target database', required=True)
-    parser.add_argument('-y', '--year', help='the year to populate database with', required=False, default=argparse.SUPPRESS)
+    parser.add_argument('-y', '--year', help='the year to populate database with', required=False,
+                        default=argparse.SUPPRESS)
 
     args = parser.parse_args()
 
