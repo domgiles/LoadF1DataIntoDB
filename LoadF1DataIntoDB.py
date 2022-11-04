@@ -141,8 +141,8 @@ if __name__ == "__main__":
     year = None
 
     parser = argparse.ArgumentParser(description='Load F1 data into database for a given year')
-    parser.add_argument('-u', '--user', help='sys username', required=True)
-    parser.add_argument('-p', '--password', help='sys password', required=True)
+    parser.add_argument('-u', '--user', help='username', required=True)
+    parser.add_argument('-p', '--password', help='password', required=True)
     parser.add_argument('-cs', '--connectstring', help='connectstring of target database', required=True)
     parser.add_argument('-y', '--year', help='the year to populate database with', required=False,
                         default=argparse.SUPPRESS)
