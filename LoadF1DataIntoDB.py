@@ -65,10 +65,11 @@ def fetch_data(connection) -> None:
             response = requests.get(api_url)
 
             constructors = xmltodict.parse(response.text)
+            rows = []
             for id, constructor in enumerate(constructors['MRData']['ConstructorTable']['Constructor']):
-                cursor.execute("insert into team values(:team_id, :name, :points)", [id, constructor['Name'], 0])
                 teams[constructor['Name']] = id
-            connection.commit()
+                rows.append((id, constructor['Name'], 0))
+            cursor.executemany("insert into team values(:team_id, :name, :points)", rows)
         print("[yellow]Inserted constructors[/yellow]")
 
         # Drivers
@@ -105,10 +106,10 @@ def fetch_data(connection) -> None:
                                                             constructor['MRData']['ConstructorTable']['Constructor'][
                                                                 'Name'])
 
+            rows = []
             for row in drivers_data_map.values():
-                cursor.execute('insert into driver values(:driver_id, :name, :points, :team_id)',
-                               [row[0], f"{row[1]} {row[2]}", 0, teams[row[3]]])
-            connection.commit()
+                rows.append((row[0], f"{row[1]} {row[2]}", 0, teams[row[3]]))
+            cursor.executemany('insert into driver values(:driver_id, :name, :points, :team_id)', rows)
         console.print("[yellow]Drivers inserted[/yellow]")
 
         with console.status("[yellow bold]Inserting circuits[/yellow bold]"):
@@ -118,11 +119,10 @@ def fetch_data(connection) -> None:
             data = response.text
             d = xmltodict.parse(data)
             a = d['MRData']['RaceTable']['Race']
+            rows = []
             for x in a:
-                cursor.execute(
-                    f"insert into race values(:race_id, :name, :laps, to_date(:race_date, 'YYYY-MM-DD'), :podium)",
-                    [x['@round'], x['RaceName'], 56, x['Date'], ''])
-            connection.commit()
+                rows.append((x['@round'], x['RaceName'], 56, x['Date'], ''))
+            cursor.executemany(f"insert into race values(:race_id, :name, :laps, to_date(:race_date, 'YYYY-MM-DD'), :podium)",rows)
         console.print("[yellow]Circuits inserted[/yellow]")
 
         with console.status("[yellow bold]Inserting results[/yellow bold]"):
@@ -141,14 +141,14 @@ def fetch_data(connection) -> None:
                 if race_data['MRData']['@total'] != "0":
                     race_name = race_data['MRData']['RaceTable']['Race']['RaceName']
                     result_list = race_data['MRData']['RaceTable']['Race']['ResultsList']['Result']
+                    rows = []
                     for rr in result_list:
-                        cursor.execute(
-                            "insert into driver_race_map values (:driver_race_map_id, :race_id, :driver_id, :position)",
-                            [race_driver_map_seq, race['@round'], drivers_map[rr['Driver']['@driverId']],
-                             rr['@position']])
+                        rows.append((race_driver_map_seq, race['@round'], drivers_map[rr['Driver']['@driverId']], rr['@position']))
                         race_driver_map_seq += 1
-            connection.commit()
+                    cursor.executemany("insert into driver_race_map values (:driver_race_map_id, :race_id, :driver_id, :position)", rows)
         console.print("[yellow]Results inserted")
+
+    connection.commit()
 
 if __name__ == "__main__":
     print("[bold magenta]F1 Data Schema Setup[/bold magenta]")
