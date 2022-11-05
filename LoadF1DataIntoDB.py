@@ -69,7 +69,7 @@ def fetch_data(connection) -> None:
             for id, constructor in enumerate(constructors['MRData']['ConstructorTable']['Constructor']):
                 teams[constructor['Name']] = id
                 rows.append((id, constructor['Name'], 0))
-            cursor.executemany("insert into team values(:team_id, :name, :points)", rows)
+            cursor.executemany("INSERT INTO team VALUES(:team_id, :name, :points)", rows)
         print("[yellow]Inserted constructors[/yellow]")
 
         # Drivers
@@ -109,7 +109,7 @@ def fetch_data(connection) -> None:
             rows = []
             for row in drivers_data_map.values():
                 rows.append((row[0], f"{row[1]} {row[2]}", 0, teams[row[3]]))
-            cursor.executemany('insert into driver values(:driver_id, :name, :points, :team_id)', rows)
+            cursor.executemany('INSERT INTO driver VALUES(:driver_id, :name, :points, :team_id)', rows)
         console.print("[yellow]Drivers inserted[/yellow]")
 
         with console.status("[yellow bold]Inserting circuits[/yellow bold]"):
@@ -122,7 +122,7 @@ def fetch_data(connection) -> None:
             rows = []
             for x in a:
                 rows.append((x['@round'], x['RaceName'], 56, x['Date'], ''))
-            cursor.executemany(f"insert into race values(:race_id, :name, :laps, to_date(:race_date, 'YYYY-MM-DD'), :podium)",rows)
+            cursor.executemany(f"INSERT INTO race VALUES(:race_id, :name, :laps, to_date(:race_date, 'YYYY-MM-DD'), :podium)",rows)
         console.print("[yellow]Circuits inserted[/yellow]")
 
         with console.status("[yellow bold]Inserting results[/yellow bold]"):
@@ -145,7 +145,7 @@ def fetch_data(connection) -> None:
                     for rr in result_list:
                         rows.append((race_driver_map_seq, race['@round'], drivers_map[rr['Driver']['@driverId']], rr['@position']))
                         race_driver_map_seq += 1
-                    cursor.executemany("insert into driver_race_map values (:driver_race_map_id, :race_id, :driver_id, :position)", rows)
+                    cursor.executemany("INSERT INTO driver_race_map VALUES (:driver_race_map_id, :race_id, :driver_id, :position)", rows)
         console.print("[yellow]Results inserted")
 
     connection.commit()
