@@ -1,5 +1,5 @@
 ## F1 Data Loader for database demos
-This is a trivial data loader for the Oracle Database. It's currently designed to work against Oracle Database 23c but I'll ease this requirment shortly to support Oracle Database 19c as well.
+This is a trivial data loader for the Oracle Database. It's currently supports Oracle Database 23c and Oracle Database 19c.
 
 It will end up creating 4 tables
 ```sql

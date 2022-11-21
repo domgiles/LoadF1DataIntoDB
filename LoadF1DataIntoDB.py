@@ -28,7 +28,7 @@ def prepare_database(connection) -> None:
             db_check = 'IF NOT EXISTS'
             json_type = 'JSON'
             db_version = connection.version[0:2]
-            if db_version == '19':
+            if db_version == '19' or db_version == '21':
                 db_check = ''
                 json_type = 'VARCHAR2 (23767), CONSTRAINT ensure_json CHECK (podium IS JSON)'
                 drop_table(cursor, 'driver_race_map')
