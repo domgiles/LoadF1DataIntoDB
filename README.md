@@ -40,7 +40,7 @@ pip install rich rich_argparse xmltodict oracledb
 ```
 
 ### Command Line Parameters
-To run the command you need to specify the username, password and connectstring of a valid Oracle Database user/schema. You can also optionally specify a valid year for the season (it defaults to the current year).
+To run the command you need to specify the username, password and connectstring of a valid Oracle Database user/schema. You can also optionally specify a valid year(s) for the season (it defaults to the current year).
 
 ```shell
  python LoadF1DataIntoDB.py -u f1 -p f1 -cs //localhost/f1
